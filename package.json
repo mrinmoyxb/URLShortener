@@ -4,12 +4,15 @@
   "description": "backend code for shortening urls",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index"
   },
   "author": "mrinmoy borah",
   "license": "ISC",
   "dependencies": {
     "express": "^4.19.2",
-    "mongoose": "^8.5.2"
+    "mongoose": "^8.5.2",
+    "nanoid": "^5.0.7",
+    "shortid": "^2.2.16"
   }
 }
