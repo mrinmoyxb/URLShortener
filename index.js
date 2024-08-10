@@ -1,8 +1,10 @@
 const express = require("express")
-const urlRoutes = require("./Routers/urlRouter")
 const {connectMongoDB} = require("./connection")
 const exp = require("constants")
-const URL = require("./Model/urlShortenerModel")
+
+// routes
+const urlRoutes = require("./Routers/urlRouter")
+const userUrl = require("./Routers/userRouter")
 
 const app = express()
 const PORT = 8001
@@ -13,8 +15,10 @@ connectMongoDB().then(()=>{
 })
 
 // Middleware
+app.use(express.urlencoded({extended: false}))
 app.use(express.json())
 app.use("/url", urlRoutes)
+app.use("/user", userUrl)
 
 // Port 
 app.listen(PORT, ()=>{
