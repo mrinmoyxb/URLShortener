@@ -28,12 +28,12 @@ async function handleGetRedirectUrlByUrlId(req, res){
     try{
         const shortId = req.params.shortId
         const entry = await URL.find({shortId: shortId})
-        if(!entry){
+        if(entry.length==0){
             return res.status(400).json({"errorMessage":"URL doesn't exist in the database"})
         }
         else{
-            const newInstance = await URL.findOneAndUpdate({shortId: shortId}, {$push: {visitHistory: {timestamp: Date.now()}}})
-            res.redirect(entry.redirectUrl)
+            await URL.findOneAndUpdate({shortId: shortId}, {$push: {visitHistory: {timestamp: Date.now()}}})
+            res.redirect(entry[0].redirectUrl)
         }
     }catch(error){
         return res.status(500).json({"errorMessage":"Internal Server Error"})
@@ -50,7 +50,7 @@ async function handleGetAnalytics(req, res){
             return res.status(400).json({"errorMessage":"URL doesn't exist in the database"})
         }
         else{
-            return res.json({totalVisit: entry.visitHistory.length, detail: entry.visitHistory})
+            return res.status(200).json({originalUrl: entry.redirectUrl, totalVisit: entry.visitHistory.length, detail: entry.visitHistory})
         }
     }catch(error){
         return res.status(500).json({"errorMessage":"Internal Server Error"})
