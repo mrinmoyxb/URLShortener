@@ -1,5 +1,5 @@
 const express = require("express")
-const {handleGenerateNewUrl, handleGetRedirectUrlByUrlId, handleGetAnalytics} = require("../Controller/urlController")
+const {handleGenerateNewUrl, handleGetRedirectUrlByUrlId, handleGetAnalytics, handleGetAllUrls} = require("../Controller/urlController")
 
 const router = express.Router()
 
@@ -11,5 +11,8 @@ router.get("/:shortId", handleGetRedirectUrlByUrlId)
 
 // GET: Analytics
 router.get("/analytics/:shortId", handleGetAnalytics)
+
+// GET: all urls
+router.get("/", handleGetAllUrls)
 
 module.exports = router
