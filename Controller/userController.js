@@ -1,4 +1,6 @@
 const express = require("express")
+const {v4: uuidv4} = require("uuid")
+const {setUser, getUser} = require("../Service/auth")
 const User = require("../Model/userModel")
 
 async function handlerSignUpUser(req, res){
@@ -28,6 +30,8 @@ async function handlerLoginUser(req, res){
         }
         else{
             console.log("user is available", user)
+            const token = setUser(user)
+            res.cookie("uid", token)
             return res.status(200).json({"msg": "Welcome"})
         }
     }
