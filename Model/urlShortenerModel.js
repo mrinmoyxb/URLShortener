@@ -1,5 +1,15 @@
 const mongoose = require("mongoose")
 
+// Visit History Schema
+const visitHistorySchema = new mongoose.Schema({
+    timestamp: {
+        type: Number
+    },
+    docId: {
+        type: Number
+    }
+})
+
 // Schema
 const urlSchema = new mongoose.Schema({
     shortId: {
@@ -16,8 +26,10 @@ const urlSchema = new mongoose.Schema({
         required: true,
         default: 0
     },
-    visitHistory: [{timestamp: {type: Number}}]
+    visitHistory: [visitHistorySchema]
 }, {timestamps: true})
+
+
 
 // Model
 const URL = mongoose.model("url", urlSchema)

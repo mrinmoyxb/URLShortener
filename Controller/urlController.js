@@ -29,14 +29,15 @@ async function handleGetRedirectUrlByUrlId(req, res){
     try{
         const shortId = req.params.shortId
         const entry = await URL.find({shortId: shortId})
-        console.log("ENTRY: ", entry)
         if(entry.length==0){
             return res.status(400).json({"msg":"URL doesn't exist in the database"})
         }
         else{
+            const visitHistoryCount = entry[0].visitHistory.length;
+            console.log(`Number of entries in visitHistory: ${visitHistoryCount}`);
             await URL.findOneAndUpdate({shortId: shortId},
                 {
-                $push: {visitHistory: {timestamp: Date.now()}},
+                $push: {visitHistory: {timestamp: Date.now(), docId: entry[0].visitHistory.length+1}},
                 $inc: {noOfVisits: 1}
             })
             res.redirect(entry[0].redirectUrl)
