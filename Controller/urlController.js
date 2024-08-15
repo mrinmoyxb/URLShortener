@@ -13,12 +13,13 @@ async function handleGenerateNewUrl(req, res){
             await URL.create({
                 shortId: shortid,
                 redirectUrl: req.body.url,
+                noOfVisits: 0,
                 visitHistory: []
             })
-            return res.json({"url": shortid})
+            return res.json({"msg": shortid})
         }
     }catch(error){
-        return res.status(500).json({"errrorMessage":"Internal Server Error"})
+        return res.status(500).json({"msg":"Internal Server Error"})
     }
 }
 
@@ -28,15 +29,20 @@ async function handleGetRedirectUrlByUrlId(req, res){
     try{
         const shortId = req.params.shortId
         const entry = await URL.find({shortId: shortId})
+        console.log("ENTRY: ", entry)
         if(entry.length==0){
-            return res.status(400).json({"errorMessage":"URL doesn't exist in the database"})
+            return res.status(400).json({"msg":"URL doesn't exist in the database"})
         }
         else{
-            await URL.findOneAndUpdate({shortId: shortId}, {$push: {visitHistory: {timestamp: Date.now()}}})
+            await URL.findOneAndUpdate({shortId: shortId},
+                {
+                $push: {visitHistory: {timestamp: Date.now()}},
+                $inc: {noOfVisits: 1}
+            })
             res.redirect(entry[0].redirectUrl)
         }
     }catch(error){
-        return res.status(500).json({"errorMessage":"Internal Server Error"})
+        return res.status(500).json({"msg":"Internal Server Error"})
     }
 }
 
@@ -47,13 +53,13 @@ async function handleGetAnalytics(req, res){
         const shortId = req.params.shortId
         const entry = await URL.findOne({shortId})
         if(!entry){
-            return res.status(400).json({"errorMessage":"URL doesn't exist in the database"})
+            return res.status(400).json({"msg":"URL doesn't exist in the database"})
         }
         else{
             return res.status(200).json({originalUrl: entry.redirectUrl, totalVisit: entry.visitHistory.length, detail: entry.visitHistory})
         }
     }catch(error){
-        return res.status(500).json({"errorMessage":"Internal Server Error"})
+        return res.status(500).json({"msg":"Internal Server Error"})
     }
 }
 
@@ -62,13 +68,13 @@ async function handleGetAllUrls(req, res){
     try{
         const allUrls = await URL.find()
         if(!allUrls){
-            return res.status(400).json({"errorMessage":"No URL's in the database"})
+            return res.status(400).json({"msg":"No URL's in the database"})
         }
         else{
-            return res.status(200).json({"allUrls": allUrls})
+            return res.status(200).json({"msg": allUrls})
         }
     }catch(error){
-        return res.status(500).json({"errorMessage":"Internal Server Error"})
+        return res.status(500).json({"msg":"Internal Server Error"})
     }
 }
 
