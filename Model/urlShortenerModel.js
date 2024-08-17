@@ -12,6 +12,12 @@ const visitHistorySchema = new mongoose.Schema({
 
 // Schema
 const urlSchema = new mongoose.Schema({
+    urlId: {
+        type: Number,
+        required: true,
+        unique: true,
+        default: 0
+    },
     shortId: {
         type: String,
         required: true,

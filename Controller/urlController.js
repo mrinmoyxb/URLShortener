@@ -5,18 +5,19 @@ const URL = require("../Model/urlShortenerModel")
 async function handleGenerateNewUrl(req, res){
     try{
         if(!req.body){
-            console.log("NOT VALID")
             return res.status(401).json({"msg": "All fields are mandatory"})
         }
         else{
             const shortid = shortID()
+            const noOfDoc = await URL.countDocuments()
             await URL.create({
+                urlId: noOfDoc+1,
                 shortId: shortid,
                 redirectUrl: req.body.url,
                 noOfVisits: 0,
                 visitHistory: []
             })
-            return res.json({"msg": shortid})
+            return res.json({"short_url": shortid})
         }
     }catch(error){
         return res.status(500).json({"msg":"Internal Server Error"})
@@ -34,7 +35,6 @@ async function handleGetRedirectUrlByUrlId(req, res){
         }
         else{
             const visitHistoryCount = entry[0].visitHistory.length;
-            console.log(`Number of entries in visitHistory: ${visitHistoryCount}`);
             await URL.findOneAndUpdate({shortId: shortId},
                 {
                 $push: {visitHistory: {timestamp: Date.now(), docId: entry[0].visitHistory.length+1}},
