@@ -1,7 +1,8 @@
 const express = require("express")
-const {setUser, getUser} = require("../Service/auth")
+const jwt = require("jsonwebtoken")
 const User = require("../Model/userModel")
 const bcrypt = require("bcrypt")
+require('dotenv').config()
 
 // sign up
 async function handlerSignUpUser(req, res){
@@ -31,10 +32,18 @@ async function handlerLoginUser(req, res){
         if(!req.body || !req.body.email || !req.body.password){
             return res.status(400).json({"msg": "Enter valid credentials"})
         }
+
         const existingUser = await User.findOne({email: req.body.email})
+
         if(existingUser){
             const checkPassword = await bcrypt.compare(req.body.password, existingUser.password)
             if(checkPassword){
+                const accessToken = jwt.sign({name: req.body.name, id: existingUser._id}, process.env.ACCESS_TOKEN, {expiresIn: '120s'})
+                const refreshToken = jwt.sign({name: req.body.name, id: existingUser._id}, process.env.REFRESH_TOKEN, {expiresIn: '30s'})
+                const updateUser = await User.findOneAndUpdate({_id: existingUser._id}, {$set: {refreshToken: refreshToken}})
+                res.cookie('jwt_token', refreshToken, {httpOnly: true, maxAge: 24*60*60*1000}) // http cookies are not available to JS
+                console.log("refresh token", refreshToken)
+                console.log("Update user: ", updateUser)
                 return res.status(200).json({"msg":"Welcome"})
             }
             else{
@@ -42,7 +51,7 @@ async function handlerLoginUser(req, res){
             }
         }
         else{
-            return res.status(400).json({"msg":"email doesn't exist"})
+            return res.status(400).json({"msg":"user doesn't exist"})
         }
     }
     catch(error){
