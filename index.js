@@ -18,7 +18,8 @@ app.use(express.urlencoded({extended: false}))
 app.use(express.json())
 
 // URL 
-app.use("/api/url", urlRoutes)
+//app.use("/api/url", urlRoutes)
+app.use("/user", userUrl)
 
 // Port 
 app.listen(process.env.PORT, ()=>{
