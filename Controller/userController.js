@@ -39,12 +39,10 @@ async function handlerLoginUser(req, res){
             const checkPassword = await bcrypt.compare(req.body.password, existingUser.password)
             if(checkPassword){
                 const accessToken = jwt.sign({name: req.body.name, id: existingUser._id}, process.env.ACCESS_TOKEN, {expiresIn: '120s'})
-                const refreshToken = jwt.sign({name: req.body.name, id: existingUser._id}, process.env.REFRESH_TOKEN, {expiresIn: '30s'})
+                const refreshToken = jwt.sign({name: req.body.name, id: existingUser._id}, process.env.REFRESH_TOKEN)
                 const updateUser = await User.findOneAndUpdate({_id: existingUser._id}, {$set: {refreshToken: refreshToken}})
                 res.cookie('jwt_token', refreshToken, {httpOnly: true, maxAge: 24*60*60*1000}) // http cookies are not available to JS
-                console.log("refresh token", refreshToken)
-                console.log("Update user: ", updateUser)
-                return res.status(200).json({"msg":"Welcome"})
+                return res.status(200).json({msg:"Welcome", access_token: accessToken})
             }
             else{
                 return res.status(200).json({"msg":"Password doesn't match"})

@@ -9,7 +9,7 @@ const verifyJwtMiddleware = (req, res, next) => {
     console.log("Header: ", authHeader)
     const token = authHeader.split(' ')[1]
 
-    jwt.verify(token, process.env.REFRESH_TOKEN, (err, decoded)=>{
+    jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded)=>{
         if(err){
             return res.status(403).json({"msg":"invalid token"})
         }
